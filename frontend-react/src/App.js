@@ -4,14 +4,19 @@ function App() {
   // Estado para almacenar los datos recuperados del servidor
   const [data, setData] = useState([]);
 
-
   // Función para obtener datos del servidor
-  const fetchData = () => {
-    fetch('http://127.0.0.1:5000/api/data')
+  const fetchData = async () => {
+    await fetch('http://127.0.0.1:5000/api/data')
       .then(response => response.json())
       .then(data => setData(data))
       .catch(error => console.error('Error:', error));
   };
+
+  console.log(data)
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div className="App">
@@ -26,7 +31,9 @@ function App() {
                 <li key={index}>{item}</li>
               ))}
             </ul>
+
           </div>
+
         ))
       ) : (
         // Mostrar mensaje si no hay datos disponibles

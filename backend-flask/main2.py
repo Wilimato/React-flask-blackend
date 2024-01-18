@@ -1,29 +1,17 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_mysqldb import MySQL
-import mysql.connector
-
 
 app = Flask(__name__)
-
-# Permite CORS para todos los recursos en la aplicación
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000",
+     "methods": ["GET", "POST", "PUT", "DELETE"], "headers": "Content-Type"}})
 
 
 # Configuración de la base de datos
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'wilimato0908'
-app.config['MYSQL_DB'] = 'asusdb'
-
-# Configura la conexión a la base de datos
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="wilimato0908",
-    database="asusdb"
-)
-cursor = db.cursor()
+app.config['MYSQL_PASSWORD'] = 'Wilimato0908*'
+app.config['MYSQL_DB'] = 'pruebapy'
 
 # Inicializar la extensión MySQL
 mysql = MySQL(app)
@@ -33,7 +21,7 @@ mysql = MySQL(app)
 def get_data():
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM historial_producto")
+        cur.execute("SELECT * FROM asusdb")
         data = cur.fetchall()
         cur.close()
         return jsonify(data)
@@ -44,22 +32,44 @@ def get_data():
 @app.route('/api/data', methods=['POST'])
 def agregar_usuario():
     try:
-        # Obtiene los datos del cuerpo de la solicitud
         data = request.get_json()
-
-        # Extrae los datos del JSON
         sku = data['sku']
         descripcion = data['descripcion']
         ventas_por_dia = data['ventas_por_dia']
         stock_total = data['stock_total']
 
-        # Inserta los datos en la base de datos
-        cursor.execute("INSERT INTO historial_producto (sku, descripcion, ventas_por_dia, stock_total) VALUES (%s, %s, %s, %s)",
-                       (sku, descripcion, ventas_por_dia, stock_total))
-        db.commit()
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO asusdb (sku, descripcion, ventas_diarias, stock_total) VALUES (%s, %s, %s, %s)",
+                    (sku, descripcion, ventas_por_dia, stock_total))
+        mysql.connection.commit()
+        cur.close()
 
         return jsonify({"mensaje": "Usuario agregado correctamente"})
 
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+# Manejador para solicitudes OPTIONS
+
+
+@app.route('/api/data/<int:id>', methods=['OPTIONS'])
+def options_handler(id):
+    response = jsonify({"mensaje": "Preflight request accepted"})
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    response.headers['Access-Control-Allow-Methods'] = 'DELETE'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    return response
+
+
+@app.route('/api/data/<id>', methods=['DELETE'])
+def eliminar_usuario(id):
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("DELETE FROM asusdb WHERE sku = %s", (id,))
+        mysql.connection.commit()
+        cur.close()
+
+        return jsonify({"mensaje": "Usuario eliminado correctamente"})
     except Exception as e:
         return jsonify({"error": str(e)})
 
