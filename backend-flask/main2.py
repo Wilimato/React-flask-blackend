@@ -8,10 +8,10 @@ CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000",
 
 
 # Configuración de la base de datos
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Wilimato0908*'
-app.config['MYSQL_DB'] = 'pruebapy'
+app.config['MYSQL_HOST'] = ''
+app.config['MYSQL_USER'] = ''
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = ''
 
 # Inicializar la extensión MySQL
 mysql = MySQL(app)
