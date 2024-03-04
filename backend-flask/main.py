@@ -8,10 +8,10 @@ CORS(app)
 
 # Configura la conexión a la base de datos
 db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="wilimato0908",
-    database="asusdb"
+    host="",
+    user="",
+    password="",
+    database=""
 )
 cursor = db.cursor()
 
